@@ -48,5 +48,6 @@ public enum EncounterType
 {
     CityTown,
     Caravan,
-    Attack
+    Attack,
+    Test
 }
