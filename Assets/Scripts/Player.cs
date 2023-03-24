@@ -25,11 +25,54 @@ public class Player : MonoBehaviour
     private int luck = 5;
     [SerializeField]
     private int longevity = 5;
+    [SerializeField]
+    private int maxHP;
+    [SerializeField]
+    private int maxStamina;
+    [SerializeField]
+    private int currentHP;
+    [SerializeField]
+    private int currentStamina;
+
+    public int Strength
+    {
+        get { return strength; }
+    }
+    public int Knowledge
+    {
+        get { return knowledge; }
+    }
+    public int Intuition
+    {
+        get { return intuition; }
+    }
+    public int Luck
+    {
+        get { return luck; }
+    }
+    public int Longevity
+    {
+        get { return longevity; }
+    }
+    public int HP
+    {
+        get { return currentHP; }
+        set { currentHP = value; }
+    }
+    public int Stamina
+    {
+        get { return currentStamina; }
+        set { currentStamina = value; }
+    }
 
     // Start is called before the first frame update
     void Start()
     {
         bounceTimer = bounceRate;
+        maxHP = longevity * 5;
+        currentHP = maxHP;
+        maxStamina = longevity * 5;
+        currentStamina = maxStamina;
     }
 
     // Update is called once per frame
