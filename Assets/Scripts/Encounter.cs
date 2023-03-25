@@ -6,15 +6,21 @@ using UnityEngine;
 
 public class Encounter : MonoBehaviour
 {
+    // Initialize in Encounter Prefab please!
     [SerializeField, Description("Type of Encounter.")]
     private EncounterType type;
+
+    // Used by the manager to tell the event when to move
     private bool send = false;
-    private List<int> playerStats = new List<int>();
     public bool Send
     {
         get { return send; }
         set { send = value; }
     }
+
+    // Holds the player's stats. Calculates encounter stat checks using these.
+    private List<int> playerStats = new List<int>();
+    
 
     public EncounterType Type
     {
@@ -29,12 +35,13 @@ public class Encounter : MonoBehaviour
 
     public void getStats(Player player)
     {
-        playerStats.Add(player.Strength);
-        playerStats.Add(player.Knowledge);
-        playerStats.Add(player.Intuition);
-        playerStats.Add(player.Luck);
-        playerStats.Add(player.HP);
-        playerStats.Add(player.Stamina);
+        //                                  Indexes:
+        playerStats.Add(player.Strength);//     0
+        playerStats.Add(player.Knowledge);//    1
+        playerStats.Add(player.Intuition);//    2
+        playerStats.Add(player.Luck);//         3
+        playerStats.Add(player.HP);//           4
+        playerStats.Add(player.Stamina);//      5
     }
     
     /// <summary>
@@ -43,6 +50,10 @@ public class Encounter : MonoBehaviour
     /// <returns>A tuple with the encounnter string and options.</returns>
     public (string, List<string>, List<int>) encounterInfo()
     {
+        // Item 1 is the text displayed in the large text box in the play area
+        // Item 2 is the list of actions + the intuition text. These come in pairs but there is a max of 4 menu buttons so please don't go above Count = 8.
+        // Item 3 is the effect on the player's HP and Stamina. These also come in pairs and each pair corresponds to a menu button, so again, don't go above 8.
+        // Need to refactor this code as it will be incredibly awkward to form encounters in the future using this style.
         (string, List<string>, List<int>) responseObject;
         List<string> actions = new List<string>();
         List<int> effects = new List<int>();

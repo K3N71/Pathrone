@@ -56,12 +56,17 @@ public class EncounterManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     { 
+        // Code that occurs during the game.
         if (globals.CurrentState == GameState.Game)
         {
+            // Make sure the game has a queue of 5 events to peek at.
             if (encounterQueue.Count < 5)
             {
+                // Once other events are made, generate pseudorandomly
                 encounterQueue.Enqueue(getEncounter(EncounterType.Test));
             }
+
+            // Every X amount of seconds, where X is encounterRate, send an encounter towards the player.
             encounterTimer -= Time.deltaTime;
             if (encounterTimer <= 0)
             {
@@ -71,6 +76,7 @@ public class EncounterManager : MonoBehaviour
 
             foreach (GameObject encounter in encounterQueue)
             {
+                // Send encounters to the right, when they hit x = 10 (about halfway into the player) trigger the encounter.
                 if (encounter.GetComponent<Encounter>().Send)
                 {
                     Vector3 moving = encounter.transform.localPosition;
@@ -89,7 +95,7 @@ public class EncounterManager : MonoBehaviour
     }
 
     /// <summary>
-    /// Gets an encounter of a specified type.
+    /// Gets an encounter of a specified type. Copied from Up the Water Spout.
     /// </summary>
     /// <param name="type">The specified EncounterType</param>
     /// <returns>The encounter GameObject.</returns>
@@ -97,14 +103,13 @@ public class EncounterManager : MonoBehaviour
     {
         GameObject encounter;
         
-        
         // check if pool has encounters of type type
         if (hasType(type))
         {
             // if yes, grabs first one
             // if it is already active, makes a new one.
-            // If not, makes it active and drops it from the top
-            encounter = this.transform.GetChild(0).gameObject;
+            // If not, makes it active.
+            encounter = this.transform.GetChild(getFirstOfType(type)).gameObject;
             if (encounter.activeInHierarchy)
             {
                 encounter = Instantiate(prefabList[typeToIndex(type)], new Vector3(this.transform.position.x, this.transform.position.y, 0.0f), Quaternion.identity);
@@ -123,25 +128,37 @@ public class EncounterManager : MonoBehaviour
             encounter.transform.SetParent(this.transform);
         }
 
-        // brings encounter to the end of the encounter list
+        // brings encounter to the end of the encounter pool.
         encounter.transform.SetAsLastSibling();
         encounter.GetComponent<Encounter>().getStats(player.GetComponent<Player>());
         return encounter;
     }
 
+    /// <summary>
+    /// Sets the encounter stage and fills the canvas with information.
+    /// </summary>
+    /// <param name="encounter">Encounter to use</param>
     private void triggerEncounter(Encounter encounter)
     {
+        // Clears any previous data
         menuData.Clear();
         statChanges.Clear();
+        
+        // Get new data
         encounter.GetComponent<Encounter>().getStats(player.GetComponent<Player>());
         (string, List<string>, List<int>) data = encounter.GetComponent<Encounter>().encounterInfo();
+
+        // Check if encounter is formatted properly, if not throw error encounter
         if (data.Item2.Count != data.Item3.Count || data.Item2.Count % 2 != 0 || data.Item3.Count % 2 != 0)
         {
             text.text = "Something went wrong and an event was formatted improperly.";
             menu1.SetActive(true);
             menu1.transform.GetChild(0).GetComponent<Button>().GetComponent<TextMeshProUGUI>().text = "Exit";
             menu1.transform.GetChild(1).GetComponent<TextMeshProUGUI>().text = "";
+            statChanges.Add(0);
+            statChanges.Add(0);
         }
+        // otherwise fill it out, if there are a certain amount of options, add the respective buttons.
         else
         {
             text.text = data.Item1;
@@ -186,6 +203,20 @@ public class EncounterManager : MonoBehaviour
         }
         return false;
     }
+    /// <summary>
+    /// To be used in conjunction with hasType(). Returns the index of the first child of a specified type.
+    /// </summary>
+    /// <param name="type">Type to search for.</param>
+    /// <returns>The index of the first child of the specified type. Returns -1 if there is none of type.</returns>
+    private int getFirstOfType(EncounterType type)
+    {
+        for (int i = 0; i < this.transform.childCount; i++)
+        {
+            if (this.transform.GetChild(i).GetComponent<Encounter>().Type == type)
+                return i;
+        }
+        return -1;
+    }
 
     /// <summary>
     /// Returns the respective index of the prefab list based on the given type.
@@ -218,6 +249,9 @@ public class EncounterManager : MonoBehaviour
         }
     }
 
+    // OnClick events, each one corresponds to a specified action.
+    // When clicked, affect the player's stats according to the encounter action.
+    // After, hide all menu buttons and change the game state back to game.
     public void OnClick1()
     {
         player.GetComponent<Player>().HP += statChanges[0];
