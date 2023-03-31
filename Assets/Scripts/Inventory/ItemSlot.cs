@@ -7,6 +7,7 @@ public class ItemSlot : MonoBehaviour {
 	[Header("Components")]
 	[SerializeField] private Image itemImage = null;
 	[SerializeField] private CursorItemSlot cursorItemSlot = null;
+	[SerializeField] private Inventory inventory = null;
 	[Header("Properties")]
 	[SerializeField] private ItemScriptableObject item = null;
 
@@ -14,13 +15,20 @@ public class ItemSlot : MonoBehaviour {
 	public ItemScriptableObject Item {
 		get => item;
 		set {
-			item = value;
+			if (value != null) {
+				/*for (int x = 0; x < item.Size.x; x++) {
+					for (int y = 0; y < item.Size.y; y++) {
+						if (inventory[x, y].Item != null) {
+							return;
+						}
+					}
+				}*/
 
-			itemImage.enabled = (item != null);
-
-			if (item != null) {
-				itemImage.sprite = item.Sprite;
+				itemImage.sprite = value.Sprite;
 			}
+
+			item = value;
+			itemImage.enabled = (value != null);
 		}
 	}
 	#endregion
@@ -34,8 +42,6 @@ public class ItemSlot : MonoBehaviour {
 	}
 
 	private void SwapItem (ItemSlot itemSlot) {
-		ItemScriptableObject currentItem = Item;
-		Item = itemSlot.Item;
-		itemSlot.Item = currentItem;
+		(itemSlot.Item, Item) = (Item, itemSlot.Item);
 	}
 }
