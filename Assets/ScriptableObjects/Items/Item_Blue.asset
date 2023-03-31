@@ -13,6 +13,11 @@ MonoBehaviour:
   m_Name: Item_Blue
   m_EditorClassIdentifier: 
   id: 2
+  size: {x: 1, y: 1}
   name: Blue
   description: This is a blue test item
-  sprite: {fileID: 1970914394, guid: 1c06c2a887d4e3f4b9289b1b918dbf2f, type: 3}
+  sprites:
+    m_keys:
+    - 00
+    m_values:
+    - {fileID: 1970914394, guid: 1c06c2a887d4e3f4b9289b1b918dbf2f, type: 3}
