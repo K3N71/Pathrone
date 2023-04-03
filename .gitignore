@@ -33,6 +33,9 @@ ExportedObj/
 *.sln
 *.suo
 *.tmp
+
+# Other excludes
+ProjectVersion.txt
 *.user
 *.userprefs
 *.pidb
