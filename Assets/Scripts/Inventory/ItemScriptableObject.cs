@@ -4,17 +4,17 @@ using UnityEngine;
 
 [CreateAssetMenu(fileName = "Item", menuName = "ScriptableObjects/Item")]
 public class ItemScriptableObject : ScriptableObject {
-	[SerializeField] private int id = -1;
-	[SerializeField] private Vector2Int size = Vector2Int.one;
-	[SerializeField] private string name = "null";
-	[SerializeField] private string description = "null";
+	[SerializeField] private int _id = -1;
+	[SerializeField] private Vector2Int _size = Vector2Int.one;
+	[SerializeField] private string _name = "null";
+	[SerializeField] private string _description = "null";
 	[SerializeField] private StringSpriteDictionary sprites = new StringSpriteDictionary( );
 
 	#region Properties
-	public int ID => id;
-	public Vector2Int Size => size;
-	public string Name => name;
-	public string Description => description;
+	public int ID => _id;
+	public Vector2Int Size => _size;
+	public string Name => _name;
+	public string Description => _description;
 
 	public Sprite Sprite => this[0, 0];
 	public Sprite this[int x, int y] {

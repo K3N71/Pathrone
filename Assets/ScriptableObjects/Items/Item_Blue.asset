@@ -12,10 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c8b4b8cbc386c844da468fd6b1308683, type: 3}
   m_Name: Item_Blue
   m_EditorClassIdentifier: 
-  id: 2
-  size: {x: 1, y: 1}
-  name: Blue
-  description: This is a blue test item
+  _id: 0
+  _size: {x: 1, y: 1}
+  _name: Blue
+  _description: This is a test blue item
   sprites:
     m_keys:
     - 00
