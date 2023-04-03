@@ -9,7 +9,7 @@ public class ItemSlot : MonoBehaviour {
     [Space]
     [SerializeField] private Image itemImage = null;
     [Header("Properties")]
-    [SerializeField] private ItemScriptableObject _item = null;
+    [SerializeField] private Item _item = null;
     [SerializeField] private Vector2Int _position = Vector2Int.zero;
     [SerializeField] private Vector2Int _spritePosition = Vector2Int.zero;
     [SerializeField] private int _groupIndex = -1;
@@ -27,7 +27,7 @@ public class ItemSlot : MonoBehaviour {
         get => _groupIndex;
         set => _groupIndex = value;
     }
-    public ItemScriptableObject Item {
+    public Item Item {
         get => _item;
         private set => _item = value;
     }
@@ -42,7 +42,7 @@ public class ItemSlot : MonoBehaviour {
         SetItem(null, Vector2Int.zero);
     }
 
-    public void SetItem (ItemScriptableObject item, Vector2Int spritePosition) {
+    public void SetItem (Item item, Vector2Int spritePosition) {
         Item = item;
         SpritePosition = spritePosition;
 

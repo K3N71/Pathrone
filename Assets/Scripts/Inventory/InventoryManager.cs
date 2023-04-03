@@ -13,10 +13,10 @@ public class InventoryManager : MonoBehaviour {
     [SerializeField] private Transform cursorItemSlotTransform = null;
     [SerializeField] private FollowMouse inventoryCursor = null;
     [Space]
-    [SerializeField] private ItemScriptableObject testItem = null;
-    [SerializeField] private ItemScriptableObject testItem2 = null;
+    [SerializeField] private Item testItem = null;
+    [SerializeField] private Item testItem2 = null;
     [Header("Properties")]
-    [SerializeField] private ItemScriptableObject _heldItem;
+    [SerializeField] private Item _heldItem;
     [SerializeField] private int _inventoryWidth = 0;
     [SerializeField] private int _inventoryHeight = 0;
     [SerializeField] private int _cursorWidth = 0;
@@ -33,7 +33,7 @@ public class InventoryManager : MonoBehaviour {
     public int CursorWidth => _cursorWidth;
     public int CursorHeight => _cursorHeight;
     public bool IsHoldingItem => (HeldItem != null);
-    public ItemScriptableObject HeldItem {
+    public Item HeldItem {
         get => _heldItem;
         set => _heldItem = value;
     }
@@ -74,8 +74,8 @@ public class InventoryManager : MonoBehaviour {
     }
 
     private void Start ( ) {
-        AddItem(GetItemSlot(Vector2Int.one), testItem);
-        AddItem(GetItemSlot(Vector2Int.zero), testItem2);
+        AddItem(GetInventoryItemSlot(Vector2Int.one), testItem);
+        AddItem(GetInventoryItemSlot(Vector2Int.zero), testItem2);
     }
     #endregion
 
@@ -83,7 +83,7 @@ public class InventoryManager : MonoBehaviour {
         // Determine which action is best based on whether or not the player is currently holding an item
         if (IsHoldingItem) {
             // If an item can be added to the area that will be taken up by the current held item, then place the item there
-            if (AddItem(GetItemSlot(inventoryItemSlot.Position - focussedPosition), HeldItem)) {
+            if (AddItem(GetInventoryItemSlot(inventoryItemSlot.Position - focussedPosition), HeldItem)) {
                 // Clear the currently held item
                 for (int i = 0; i < cursorItemSlots.Count; i++) {
                     Vector2Int position = new Vector2Int(i % CursorWidth, i / CursorWidth);
@@ -96,11 +96,12 @@ public class InventoryManager : MonoBehaviour {
             }
         } else {
             // If an item can be removed from the inventory slot and can be held by the cursor item slots, then remove the item
-            if (RemoveItem(inventoryItemSlot, out ItemScriptableObject item)) {
+            Vector2Int spritePosition = inventoryItemSlot.SpritePosition;
+            if (RemoveItem(inventoryItemSlot, out Item item)) {
                 // Align the cursor item slots
-                ItemSlot topLeftItemSlot = GetItemSlot(inventoryItemSlot.Position - inventoryItemSlot.SpritePosition);
-                inventoryCursor.Offset = inventoryCursor.transform.position - topLeftItemSlot.transform.position;
-                focussedPosition = inventoryItemSlot.SpritePosition;
+                ItemSlot topLeftItemSlot = GetInventoryItemSlot(inventoryItemSlot.Position - spritePosition);
+                inventoryCursor.Offset = topLeftItemSlot.transform.position - (inventoryCursor.transform.position - inventoryCursor.Offset);
+                focussedPosition = spritePosition;
 
                 // Add the item to the cursor item slots
                 for (int i = 0; i < cursorItemSlots.Count; i++) {
@@ -123,113 +124,42 @@ public class InventoryManager : MonoBehaviour {
         return false;
     }
 
-    /* public bool HoldItem (ItemSlot inventoryItemSlot) {
-         // If the item slot does not have an item in it, then do not try and pick that item
-         if (inventoryItemSlot.Item == null) {
-             return false;
-         }
-
-         // Align the cursor item slots to be able to fit the item in the inventory
-         ItemSlot topLeftItemSlot = GetItemSlot(inventoryItemSlot.Position - inventoryItemSlot.SpritePosition);
-         cursorItemSlotManager.Offset = cursorItemSlotManager.transform.position - topLeftItemSlot.transform.position;
-         cursorItemSlotManager.FocussedPosition = inventoryItemSlot.SpritePosition;
-
-         // Get all of the item slots that are grouped together with the parent item slot
-         List<ItemSlot> groupedItemSlots = GetGroupedItemSlots(inventoryItemSlot);
-
-         // For all the item slots in the group, transfer their item to the corresponding cursor item slot
-         while (groupedItemSlots.Count > 0) {
-             // Set the corresponding cursor item slot sprite position and item
-             cursorItemSlotManager.SetCursorItemSlotItem(groupedItemSlots[0].SpritePosition, inventoryItemSlot.Item, groupedItemSlots[0].SpritePosition);
-             SetItemSlotItem(groupedItemSlots[0].Position, null, Vector2Int.zero);
-
-             // Remove the item slot from the list of grouped item slots
-             // Also reset the group id of the item slot as it is no longer part of a group
-             groupedItemSlots[0].GroupIndex = -1;
-             groupedItemSlots.RemoveAt(0);
-         }
-
-         HeldItem = inventoryItemSlot.Item;
-         return true;
-     }*/
-
-    /*public bool PlaceHeldItem (ItemSlot inventoryItemSlot) {
+    public bool AddItem (ItemSlot topLeftItemSlot, Item item) {
         // Make sure that all item slots are free before trying to place the item
         // If they are not all free, then the item cannot be placed
-        List<ItemSlot> affectedItemSlots = new List<ItemSlot>( );
-        for (int i = 0; i < cursorItemSlotManager.CursorItemSlotsCount; i++) {
-            // Get an item slot that will be interacted with by the cursor
-            ItemSlot cursorItemSlot = cursorItemSlotManager.GetCursorItemSlot(new Vector2Int(i % cursorItemSlotManager.Width, i / cursorItemSlotManager.Width));
-            ItemSlot currentInventoryItemSlot = GetItemSlot((inventoryItemSlot.Position - cursorItemSlotManager.FocussedPosition) + cursorItemSlot.Position);
-
-            // If the cursor item slot has no item, then continue to the next item slot
-            // Not matter what, the corresponding inventory item slot will not be affected
-            if (cursorItemSlot.Item == null) {
-                continue;
-            }
-
-            // If the inventory item slot currently has an item, then a new item cannot be placed here
-            if (currentInventoryItemSlot == null || currentInventoryItemSlot.Item != null) {
-                return false;
-            }
-
-            affectedItemSlots.Add(currentInventoryItemSlot);
-        }
-
-        // Add a new index to the item slot groups
-        inventoryItemSlotGroups.Add(new List<ItemSlot>( ));
-
-        for (int i = 0; i < affectedItemSlots.Count; i++) {
-            // Set the item of the item slot
-            Vector2Int cursorItemSlotPosition = new Vector2Int(i % HeldItem.Size.x, i / HeldItem.Size.x);
-            SetItemSlotItem(affectedItemSlots[i].Position, HeldItem, cursorItemSlotPosition);
-            cursorItemSlotManager.SetCursorItemSlotItem(cursorItemSlotPosition, null, Vector2Int.zero);
-
-            // Add the grouped item slot to its new group
-            // Also change the group index to match the array index
-            affectedItemSlots[i].GroupIndex = inventoryItemSlotGroups.Count - 1;
-            inventoryItemSlotGroups[^1].Add(affectedItemSlots[i]);
-        }
-
-        HeldItem = null;
-        return true;
-    }*/
-
-    public bool AddItem (ItemSlot topLeftItemSlot, ItemScriptableObject item) {
-        // Make sure that all item slots are free before trying to place the item
-        // If they are not all free, then the item cannot be placed
-        List<ItemSlot> affectedItemSlots = new List<ItemSlot>( );
+        List<ItemSlot> effectedInventoryItemSlots = new List<ItemSlot>( );
         for (int i = 0; i < item.Size.x * item.Size.y; i++) {
             // Get an item slot that will be interacted with by the cursor
             Vector2Int spritePosition = new Vector2Int(i % item.Size.x, i / item.Size.x);
-            ItemSlot inventoryItemSlot = GetItemSlot(topLeftItemSlot.Position + spritePosition);
+            ItemSlot inventoryItemSlot = GetInventoryItemSlot(topLeftItemSlot.Position + spritePosition);
 
             // If the inventory item slot currently has an item, then a new item cannot be placed here
             if (inventoryItemSlot == null || inventoryItemSlot.Item != null) {
                 return false;
             }
 
-            affectedItemSlots.Add(inventoryItemSlot);
+            effectedInventoryItemSlots.Add(inventoryItemSlot);
         }
 
-        // Add a new index to the item slot groups
-        inventoryItemSlotGroups.Add(new List<ItemSlot>( ));
+        // Get an open group index
+        int inventoryItemSlotGroupIndex = GetFirstOpenGroupIndex( );
 
-        for (int i = 0; i < affectedItemSlots.Count; i++) {
+        // Set the item on each of the effected inventory item slots
+        for (int i = 0; i < effectedInventoryItemSlots.Count; i++) {
             // Set the item of the item slot
             Vector2Int spritePosition = new Vector2Int(i % item.Size.x, i / item.Size.x);
-            SetItemSlotItem(affectedItemSlots[i].Position, item, spritePosition);
+            SetInventoryItemSlotItem(effectedInventoryItemSlots[i].Position, item, spritePosition);
 
             // Add the grouped item slot to its new group
             // Also change the group index to match the array index
-            affectedItemSlots[i].GroupIndex = inventoryItemSlotGroups.Count - 1;
-            inventoryItemSlotGroups[^1].Add(affectedItemSlots[i]);
+            effectedInventoryItemSlots[i].GroupIndex = inventoryItemSlotGroupIndex;
+            inventoryItemSlotGroups[inventoryItemSlotGroupIndex].Add(effectedInventoryItemSlots[i]);
         }
 
         return true;
     }
 
-    public bool RemoveItem (ItemSlot inventoryItemSlot, out ItemScriptableObject item) {
+    public bool RemoveItem (ItemSlot inventoryItemSlot, out Item item) {
         // If the item slot does not have an item in it, then do not try and remove an item
         item = inventoryItemSlot.Item;
         if (item == null) {
@@ -240,13 +170,12 @@ public class InventoryManager : MonoBehaviour {
         List<ItemSlot> itemSlotGroup = new List<ItemSlot>( ) { inventoryItemSlot };
         if (inventoryItemSlot.GroupIndex != -1) {
             itemSlotGroup = inventoryItemSlotGroups[inventoryItemSlot.GroupIndex];
-            inventoryItemSlotGroups.RemoveAt(inventoryItemSlot.GroupIndex);
         }
 
         // For all the item slots in the group, remove them from the board
         while (itemSlotGroup.Count > 0) {
             // Remove the item from the item slot
-            SetItemSlotItem(itemSlotGroup[0].Position, null, Vector2Int.zero);
+            SetInventoryItemSlotItem(itemSlotGroup[0].Position, null, Vector2Int.zero);
 
             // Remove the item slot from the list of grouped item slots
             // Also reset the group id of the item slot as it is no longer part of a group
@@ -257,17 +186,7 @@ public class InventoryManager : MonoBehaviour {
         return true;
     }
 
-    /* private List<ItemSlot> GetGroupedItemSlots (ItemSlot itemSlot) {
-         List<ItemSlot> groupedItemSlots = new List<ItemSlot>( ) { itemSlot };
-         if (itemSlot.GroupIndex != -1) {
-             groupedItemSlots = inventoryItemSlotGroups[itemSlot.GroupIndex];
-             inventoryItemSlotGroups.RemoveAt(itemSlot.GroupIndex);
-         }
-
-         return groupedItemSlots;
-     }*/
-
-    public ItemSlot GetItemSlot (Vector2Int position) {
+    public ItemSlot GetInventoryItemSlot (Vector2Int position) {
         if (position.x < 0 || position.x >= InventoryWidth || position.y < 0 || position.y >= InventoryHeight) {
             return null;
         }
@@ -283,18 +202,24 @@ public class InventoryManager : MonoBehaviour {
         return cursorItemSlots[position.x + (position.y * CursorWidth)];
     }
 
-    public void SetItemSlotItem (Vector2Int position, ItemScriptableObject item, Vector2Int spritePosition) {
-        GetItemSlot(position).SetItem(item, spritePosition);
+    private int GetFirstOpenGroupIndex ( ) {
+        // Loop through all of the groups and find the first empty one
+        for (int i = 0; i < inventoryItemSlotGroups.Count; i++) {
+            if (inventoryItemSlotGroups[i].Count == 0) {
+                return i;
+            }
+        }
+
+        // If no groups are empty, create a new one
+        inventoryItemSlotGroups.Add(new List<ItemSlot>( ));
+        return inventoryItemSlotGroups.Count - 1;
     }
 
-    public void SetCursorItemSlotItem (Vector2Int position, ItemScriptableObject item, Vector2Int spritePosition) {
+    public void SetInventoryItemSlotItem (Vector2Int position, Item item, Vector2Int spritePosition) {
+        GetInventoryItemSlot(position).SetItem(item, spritePosition);
+    }
+
+    public void SetCursorItemSlotItem (Vector2Int position, Item item, Vector2Int spritePosition) {
         GetCursorItemSlot(position).SetItem(item, spritePosition);
     }
-
-    /*private void ClearCursorItemSlots ( ) {
-        for (int i = 0; i < cursorItemSlots.Count; i++) {
-            Vector2Int position = new Vector2Int(i % CursorWidth, i / CursorWidth);
-            SetCursorItemSlotItem(position, null, Vector2Int.zero);
-        }
-    }*/
 }
