@@ -83,6 +83,7 @@ public class InventoryManager : MonoBehaviour {
     }
 
     private void Start ( ) {
+        // Add a bunch of items to the inventory to test it out
         InsertItem(ItemType.TEST_RED);
         InsertItem(ItemType.TEST_PURPLEPINK);
         InsertItem(ItemType.TEST_BLUE);
@@ -91,6 +92,11 @@ public class InventoryManager : MonoBehaviour {
     }
     #endregion
 
+    /// <summary>
+    /// Handle an interaction with an inventory item slot. This might pick up an item or place an item.
+    /// </summary>
+    /// <param name="inventoryItemSlot">The inventory item slot that was interacted with</param>
+    /// <returns>Returns whether or not the actions performed inside this method were successful or not</returns>
     public bool InteractWithItemSlot (ItemSlot inventoryItemSlot) {
         // Determine which action is best based on whether or not the player is currently holding an item
         if (IsHoldingItem) {
@@ -139,14 +145,30 @@ public class InventoryManager : MonoBehaviour {
         return false;
     }
 
+    /// <summary>
+    /// Add an item at a certain inventory item slot to the inventory
+    /// </summary>
+    /// <param name="itemSlot">The top-left corner of where the item should be placed</param>
+    /// <param name="itemType">The item type to add</param>
+    /// <returns>Returns whether or not the item was successfully added to the inventory</returns>
     public bool AddItem (ItemSlot itemSlot, ItemType itemType) {
         // Get the scriptable object of the item type
         Item item = _items[itemType];
 
         // Make sure that all item slots are free before trying to place the item
         // If they are not all free, then the item cannot be placed
-        if (!CanPlaceItem(itemSlot, itemType, out List<ItemSlot> effectedInventoryItemSlots)) {
-            return false;
+        List<ItemSlot> effectedInventoryItemSlots = new List<ItemSlot>( );
+        for (int i = 0; i < item.Size.x * item.Size.y; i++) {
+            // Get an item slot that will be interacted with by the cursor
+            Vector2Int spritePosition = new Vector2Int(i % item.Size.x, i / item.Size.x);
+            ItemSlot inventoryItemSlot = GetInventoryItemSlot(itemSlot.Position + spritePosition);
+
+            // If the inventory item slot currently has an item, then a new item cannot be placed here
+            if (inventoryItemSlot == null || inventoryItemSlot.ItemType != ItemType.NULL) {
+                return false;
+            }
+
+            effectedInventoryItemSlots.Add(inventoryItemSlot);
         }
 
         // Get an open group index
@@ -167,6 +189,11 @@ public class InventoryManager : MonoBehaviour {
         return true;
     }
 
+    /// <summary>
+    /// Insert an item into the inventory at the first avaiable item slot
+    /// </summary>
+    /// <param name="itemType">The item type to add</param>
+    /// <returns>Returns whether or not the item was successfully added to the inventory</returns>
     public bool InsertItem (ItemType itemType) {
         // Loop through all of the inventory item slots and check to see if the item can be added to that location
         for (int i = 0; i < inventoryItemSlots.Count; i++) {
@@ -180,17 +207,23 @@ public class InventoryManager : MonoBehaviour {
         return false;
     }
 
-    public bool RemoveItem (ItemSlot inventoryItemSlot, out ItemType itemType) {
+    /// <summary>
+    /// Remove an item from a certain inventory item slot in the inventory
+    /// </summary>
+    /// <param name="itemSlot">The item slot to remove the item of</param>
+    /// <param name="itemType">A reference to the item that was removed from the inventory</param>
+    /// <returns>Returns whether or not the item was successfully removed</returns>
+    public bool RemoveItem (ItemSlot itemSlot, out ItemType itemType) {
         // If the item slot does not have an item in it, then do not try and remove an item
-        itemType = inventoryItemSlot.ItemType;
+        itemType = itemSlot.ItemType;
         if (itemType == ItemType.NULL) {
             return false;
         }
 
         // Get all of the item slots that are grouped together with the input item slot
-        List<ItemSlot> itemSlotGroup = new List<ItemSlot>( ) { inventoryItemSlot };
-        if (inventoryItemSlot.GroupIndex != -1) {
-            itemSlotGroup = inventoryItemSlotGroups[inventoryItemSlot.GroupIndex];
+        List<ItemSlot> itemSlotGroup = new List<ItemSlot>( ) { itemSlot };
+        if (itemSlot.GroupIndex != -1) {
+            itemSlotGroup = inventoryItemSlotGroups[itemSlot.GroupIndex];
         }
 
         // For all the item slots in the group, remove them from the board
@@ -207,26 +240,11 @@ public class InventoryManager : MonoBehaviour {
         return true;
     }
 
-    private bool CanPlaceItem (ItemSlot itemSlot, ItemType itemType, out List<ItemSlot> effectedInventoryItemSlots) {
-        effectedInventoryItemSlots = new List<ItemSlot>( );
-        Item item = _items[itemType];
-
-        for (int i = 0; i < item.Size.x * item.Size.y; i++) {
-            // Get an item slot that will be interacted with by the cursor
-            Vector2Int spritePosition = new Vector2Int(i % item.Size.x, i / item.Size.x);
-            ItemSlot inventoryItemSlot = GetInventoryItemSlot(itemSlot.Position + spritePosition);
-
-            // If the inventory item slot currently has an item, then a new item cannot be placed here
-            if (inventoryItemSlot == null || inventoryItemSlot.ItemType != ItemType.NULL) {
-                return false;
-            }
-
-            effectedInventoryItemSlots.Add(inventoryItemSlot);
-        }
-
-        return true;
-    }
-
+    /// <summary>
+    /// Get an inventory item slot based on a grid position
+    /// </summary>
+    /// <param name="position">The grid position of the item slot trying to be found</param>
+    /// <returns>Returns the item slot if one exists at the input position, null otherwise</returns>
     private ItemSlot GetInventoryItemSlot (Vector2Int position) {
         if (position.x < 0 || position.x >= InventoryWidth || position.y < 0 || position.y >= InventoryHeight) {
             return null;
@@ -235,6 +253,11 @@ public class InventoryManager : MonoBehaviour {
         return inventoryItemSlots[position.x + (position.y * InventoryWidth)];
     }
 
+    /// <summary>
+    /// Get a cursor item slot based on a grid position
+    /// </summary>
+    /// <param name="position">The grid position of the item slot trying to be found</param>
+    /// <returns>Returns the item slot if one exists at the input position, null otherwise</returns>
     private ItemSlot GetCursorItemSlot (Vector2Int position) {
         if (position.x < 0 || position.x >= CursorWidth || position.y < 0 || position.y >= CursorHeight) {
             return null;
@@ -243,6 +266,10 @@ public class InventoryManager : MonoBehaviour {
         return cursorItemSlots[position.x + (position.y * CursorWidth)];
     }
 
+    /// <summary>
+    /// Find the first open item slot group index in the array
+    /// </summary>
+    /// <returns>Returns an integer that represents the index of the first empty group index</returns>
     private int GetFirstOpenGroupIndex ( ) {
         // Loop through all of the groups and find the first empty one
         for (int i = 0; i < inventoryItemSlotGroups.Count; i++) {
@@ -256,10 +283,22 @@ public class InventoryManager : MonoBehaviour {
         return inventoryItemSlotGroups.Count - 1;
     }
 
+    /// <summary>
+    /// Set the item type of an inventory item slot
+    /// </summary>
+    /// <param name="position">The position of the inventory item slot to set</param>
+    /// <param name="itemType">The type of item to set to the inventory item slot</param>
+    /// <param name="spritePosition">The section of the sprite that will show up in the inventory item slot</param>
     private void SetInventoryItemSlotItem (Vector2Int position, ItemType itemType, Vector2Int spritePosition) {
         GetInventoryItemSlot(position).SetItem(itemType, spritePosition);
     }
 
+    /// <summary>
+    /// Set the item type of an cursor item slot
+    /// </summary>
+    /// <param name="position">The position of the cursor item slot to set</param>
+    /// <param name="itemType">The type of item to set to the cursor item slot</param>
+    /// <param name="spritePosition">The section of the sprite that will show up in the cursor item slot</param>
     private void SetCursorItemSlotItem (Vector2Int position, ItemType itemType, Vector2Int spritePosition) {
         GetCursorItemSlot(position).SetItem(itemType, spritePosition);
     }
