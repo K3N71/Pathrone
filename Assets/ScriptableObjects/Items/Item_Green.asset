@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c8b4b8cbc386c844da468fd6b1308683, type: 3}
   m_Name: Item_Green
   m_EditorClassIdentifier: 
-  _id: 1
+  _itemType: 2
   _size: {x: 1, y: 1}
   _name: Green
   _description: This is a test green item

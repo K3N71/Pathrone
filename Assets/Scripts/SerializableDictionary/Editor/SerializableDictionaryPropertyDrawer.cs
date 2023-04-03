@@ -490,5 +490,6 @@ public class SerializableDictionaryStoragePropertyDrawer : PropertyDrawer {
 
 #region Custom Dictionaries
 [CustomPropertyDrawer(typeof(StringSpriteDictionary))]
+[CustomPropertyDrawer(typeof(ItemTypeItemDictionary))]
 public class AnySerializableDictionaryPropertyDrawer : SerializableDictionaryPropertyDrawer { }
 #endregion

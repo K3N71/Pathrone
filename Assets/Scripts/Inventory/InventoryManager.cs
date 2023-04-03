@@ -6,6 +6,15 @@ using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.UIElements;
+using static UnityEditor.Progress;
+
+public enum ItemType {
+    NULL,
+    TEST_RED,
+    TEST_GREEN,
+    TEST_BLUE,
+    TEST_PURPLEPINK
+}
 
 public class InventoryManager : MonoBehaviour {
     [Header("Components")]
@@ -13,10 +22,9 @@ public class InventoryManager : MonoBehaviour {
     [SerializeField] private Transform cursorItemSlotTransform = null;
     [SerializeField] private FollowMouse inventoryCursor = null;
     [Space]
-    [SerializeField] private Item testItem = null;
-    [SerializeField] private Item testItem2 = null;
+    [SerializeField] private ItemTypeItemDictionary _items = new ItemTypeItemDictionary( );
     [Header("Properties")]
-    [SerializeField] private Item _heldItem;
+    [SerializeField] private ItemType _heldItemType;
     [SerializeField] private int _inventoryWidth = 0;
     [SerializeField] private int _inventoryHeight = 0;
     [SerializeField] private int _cursorWidth = 0;
@@ -32,11 +40,12 @@ public class InventoryManager : MonoBehaviour {
     public int InventoryHeight => _inventoryHeight;
     public int CursorWidth => _cursorWidth;
     public int CursorHeight => _cursorHeight;
-    public bool IsHoldingItem => (HeldItem != null);
-    public Item HeldItem {
-        get => _heldItem;
-        set => _heldItem = value;
+    public bool IsHoldingItem => (HeldItemType != ItemType.NULL);
+    public ItemType HeldItemType {
+        get => _heldItemType;
+        set => _heldItemType = value;
     }
+    public ItemTypeItemDictionary Items => _items;
     #endregion
 
     #region Unity
@@ -74,8 +83,11 @@ public class InventoryManager : MonoBehaviour {
     }
 
     private void Start ( ) {
-        AddItem(GetInventoryItemSlot(Vector2Int.one), testItem);
-        AddItem(GetInventoryItemSlot(Vector2Int.zero), testItem2);
+        InsertItem(ItemType.TEST_RED);
+        InsertItem(ItemType.TEST_PURPLEPINK);
+        InsertItem(ItemType.TEST_BLUE);
+        InsertItem(ItemType.TEST_GREEN);
+        InsertItem(ItemType.TEST_GREEN);
     }
     #endregion
 
@@ -83,13 +95,13 @@ public class InventoryManager : MonoBehaviour {
         // Determine which action is best based on whether or not the player is currently holding an item
         if (IsHoldingItem) {
             // If an item can be added to the area that will be taken up by the current held item, then place the item there
-            if (AddItem(GetInventoryItemSlot(inventoryItemSlot.Position - focussedPosition), HeldItem)) {
+            if (AddItem(GetInventoryItemSlot(inventoryItemSlot.Position - focussedPosition), HeldItemType)) {
                 // Clear the currently held item
                 for (int i = 0; i < cursorItemSlots.Count; i++) {
                     Vector2Int position = new Vector2Int(i % CursorWidth, i / CursorWidth);
-                    SetCursorItemSlotItem(position, null, Vector2Int.zero);
+                    SetCursorItemSlotItem(position, ItemType.NULL, Vector2Int.zero);
                 }
-                HeldItem = null;
+                HeldItemType = ItemType.NULL;
 
                 // Adding the item was successful, so return true
                 return true;
@@ -97,7 +109,10 @@ public class InventoryManager : MonoBehaviour {
         } else {
             // If an item can be removed from the inventory slot and can be held by the cursor item slots, then remove the item
             Vector2Int spritePosition = inventoryItemSlot.SpritePosition;
-            if (RemoveItem(inventoryItemSlot, out Item item)) {
+            if (RemoveItem(inventoryItemSlot, out ItemType itemType)) {
+                // Get the scriptable object of the item type
+                Item item = _items[itemType];
+
                 // Align the cursor item slots
                 ItemSlot topLeftItemSlot = GetInventoryItemSlot(inventoryItemSlot.Position - spritePosition);
                 inventoryCursor.Offset = topLeftItemSlot.transform.position - (inventoryCursor.transform.position - inventoryCursor.Offset);
@@ -112,9 +127,9 @@ public class InventoryManager : MonoBehaviour {
                         continue;
                     }
 
-                    SetCursorItemSlotItem(position, item, position);
+                    SetCursorItemSlotItem(position, itemType, position);
                 }
-                HeldItem = item;
+                HeldItemType = itemType;
 
                 // Removing the item from the inventory was successful, so return true
                 return true;
@@ -124,21 +139,14 @@ public class InventoryManager : MonoBehaviour {
         return false;
     }
 
-    public bool AddItem (ItemSlot topLeftItemSlot, Item item) {
+    public bool AddItem (ItemSlot itemSlot, ItemType itemType) {
+        // Get the scriptable object of the item type
+        Item item = _items[itemType];
+
         // Make sure that all item slots are free before trying to place the item
         // If they are not all free, then the item cannot be placed
-        List<ItemSlot> effectedInventoryItemSlots = new List<ItemSlot>( );
-        for (int i = 0; i < item.Size.x * item.Size.y; i++) {
-            // Get an item slot that will be interacted with by the cursor
-            Vector2Int spritePosition = new Vector2Int(i % item.Size.x, i / item.Size.x);
-            ItemSlot inventoryItemSlot = GetInventoryItemSlot(topLeftItemSlot.Position + spritePosition);
-
-            // If the inventory item slot currently has an item, then a new item cannot be placed here
-            if (inventoryItemSlot == null || inventoryItemSlot.Item != null) {
-                return false;
-            }
-
-            effectedInventoryItemSlots.Add(inventoryItemSlot);
+        if (!CanPlaceItem(itemSlot, itemType, out List<ItemSlot> effectedInventoryItemSlots)) {
+            return false;
         }
 
         // Get an open group index
@@ -148,7 +156,7 @@ public class InventoryManager : MonoBehaviour {
         for (int i = 0; i < effectedInventoryItemSlots.Count; i++) {
             // Set the item of the item slot
             Vector2Int spritePosition = new Vector2Int(i % item.Size.x, i / item.Size.x);
-            SetInventoryItemSlotItem(effectedInventoryItemSlots[i].Position, item, spritePosition);
+            SetInventoryItemSlotItem(effectedInventoryItemSlots[i].Position, itemType, spritePosition);
 
             // Add the grouped item slot to its new group
             // Also change the group index to match the array index
@@ -159,10 +167,23 @@ public class InventoryManager : MonoBehaviour {
         return true;
     }
 
-    public bool RemoveItem (ItemSlot inventoryItemSlot, out Item item) {
+    public bool InsertItem (ItemType itemType) {
+        // Loop through all of the inventory item slots and check to see if the item can be added to that location
+        for (int i = 0; i < inventoryItemSlots.Count; i++) {
+            // If the item can be added, then add it to inventory and return true
+            if (AddItem(inventoryItemSlots[i], itemType)) {
+                return true;
+            }
+        }
+
+        // If all of the inventory slots have been checked and the item cannot fit anywhere, then return false
+        return false;
+    }
+
+    public bool RemoveItem (ItemSlot inventoryItemSlot, out ItemType itemType) {
         // If the item slot does not have an item in it, then do not try and remove an item
-        item = inventoryItemSlot.Item;
-        if (item == null) {
+        itemType = inventoryItemSlot.ItemType;
+        if (itemType == ItemType.NULL) {
             return false;
         }
 
@@ -175,7 +196,7 @@ public class InventoryManager : MonoBehaviour {
         // For all the item slots in the group, remove them from the board
         while (itemSlotGroup.Count > 0) {
             // Remove the item from the item slot
-            SetInventoryItemSlotItem(itemSlotGroup[0].Position, null, Vector2Int.zero);
+            SetInventoryItemSlotItem(itemSlotGroup[0].Position, ItemType.NULL, Vector2Int.zero);
 
             // Remove the item slot from the list of grouped item slots
             // Also reset the group id of the item slot as it is no longer part of a group
@@ -186,7 +207,27 @@ public class InventoryManager : MonoBehaviour {
         return true;
     }
 
-    public ItemSlot GetInventoryItemSlot (Vector2Int position) {
+    private bool CanPlaceItem (ItemSlot itemSlot, ItemType itemType, out List<ItemSlot> effectedInventoryItemSlots) {
+        effectedInventoryItemSlots = new List<ItemSlot>( );
+        Item item = _items[itemType];
+
+        for (int i = 0; i < item.Size.x * item.Size.y; i++) {
+            // Get an item slot that will be interacted with by the cursor
+            Vector2Int spritePosition = new Vector2Int(i % item.Size.x, i / item.Size.x);
+            ItemSlot inventoryItemSlot = GetInventoryItemSlot(itemSlot.Position + spritePosition);
+
+            // If the inventory item slot currently has an item, then a new item cannot be placed here
+            if (inventoryItemSlot == null || inventoryItemSlot.ItemType != ItemType.NULL) {
+                return false;
+            }
+
+            effectedInventoryItemSlots.Add(inventoryItemSlot);
+        }
+
+        return true;
+    }
+
+    private ItemSlot GetInventoryItemSlot (Vector2Int position) {
         if (position.x < 0 || position.x >= InventoryWidth || position.y < 0 || position.y >= InventoryHeight) {
             return null;
         }
@@ -194,7 +235,7 @@ public class InventoryManager : MonoBehaviour {
         return inventoryItemSlots[position.x + (position.y * InventoryWidth)];
     }
 
-    public ItemSlot GetCursorItemSlot (Vector2Int position) {
+    private ItemSlot GetCursorItemSlot (Vector2Int position) {
         if (position.x < 0 || position.x >= CursorWidth || position.y < 0 || position.y >= CursorHeight) {
             return null;
         }
@@ -215,11 +256,11 @@ public class InventoryManager : MonoBehaviour {
         return inventoryItemSlotGroups.Count - 1;
     }
 
-    public void SetInventoryItemSlotItem (Vector2Int position, Item item, Vector2Int spritePosition) {
-        GetInventoryItemSlot(position).SetItem(item, spritePosition);
+    private void SetInventoryItemSlotItem (Vector2Int position, ItemType itemType, Vector2Int spritePosition) {
+        GetInventoryItemSlot(position).SetItem(itemType, spritePosition);
     }
 
-    public void SetCursorItemSlotItem (Vector2Int position, Item item, Vector2Int spritePosition) {
-        GetCursorItemSlot(position).SetItem(item, spritePosition);
+    private void SetCursorItemSlotItem (Vector2Int position, ItemType itemType, Vector2Int spritePosition) {
+        GetCursorItemSlot(position).SetItem(itemType, spritePosition);
     }
 }

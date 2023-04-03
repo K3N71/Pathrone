@@ -105,4 +105,6 @@ public class SerializableDictionary<TKey, TValue, TValueStorage> : SerializableD
 #region Custom Dictionaries
 [Serializable]
 public class StringSpriteDictionary : SerializableDictionary<string, Sprite> { }
+[Serializable]
+public class ItemTypeItemDictionary : SerializableDictionary<ItemType, Item> { }
 #endregion

@@ -9,7 +9,7 @@ public class ItemSlot : MonoBehaviour {
     [Space]
     [SerializeField] private Image itemImage = null;
     [Header("Properties")]
-    [SerializeField] private Item _item = null;
+    [SerializeField] private ItemType _itemType = ItemType.NULL;
     [SerializeField] private Vector2Int _position = Vector2Int.zero;
     [SerializeField] private Vector2Int _spritePosition = Vector2Int.zero;
     [SerializeField] private int _groupIndex = -1;
@@ -27,9 +27,9 @@ public class ItemSlot : MonoBehaviour {
         get => _groupIndex;
         set => _groupIndex = value;
     }
-    public Item Item {
-        get => _item;
-        private set => _item = value;
+    public ItemType ItemType {
+        get => _itemType;
+        private set => _itemType = value;
     }
     #endregion
 
@@ -39,16 +39,16 @@ public class ItemSlot : MonoBehaviour {
         // Make sure the inventory starts with no items in it
         // For now, this makes it easier to deal with adding items to the inventory
         // In the future having functionality to set inventory items in the editor may be a good idea
-        SetItem(null, Vector2Int.zero);
+        SetItem(ItemType.NULL, Vector2Int.zero);
     }
 
-    public void SetItem (Item item, Vector2Int spritePosition) {
-        Item = item;
+    public void SetItem (ItemType itemType, Vector2Int spritePosition) {
+        ItemType = itemType;
         SpritePosition = spritePosition;
 
-        itemImage.enabled = (item != null);
-        if (item != null) {
-            itemImage.sprite = item[SpritePosition.x, SpritePosition.y];
+        itemImage.enabled = (itemType != ItemType.NULL);
+        if (itemType != ItemType.NULL) {
+            itemImage.sprite = inventoryManager.Items[itemType][SpritePosition.x, SpritePosition.y];
         }
     }
 

@@ -145,7 +145,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 0}
+  m_Sprite: {fileID: -371921780, guid: 15e752c08b21bb04f9225a488f873c8e, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -179,7 +179,7 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 200, y: 200}
+  m_Size: {x: 100, y: 100}
   m_EdgeRadius: 0
 --- !u!114 &5020811340808139897
 MonoBehaviour:
@@ -193,6 +193,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 42cde9f440c3b2640ad54925a72c7bec, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  inventoryManager: {fileID: 0}
   itemImage: {fileID: 2694767931023946153}
-  cursorItemSlot: {fileID: 0}
-  item: {fileID: 0}
+  _itemType: 0
+  _position: {x: 0, y: 0}
+  _spritePosition: {x: 0, y: 0}
+  _groupIndex: -1

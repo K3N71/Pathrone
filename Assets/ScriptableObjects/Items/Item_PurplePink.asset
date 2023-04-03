@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c8b4b8cbc386c844da468fd6b1308683, type: 3}
   m_Name: Item_PurplePink
   m_EditorClassIdentifier: 
-  _id: 2
+  _itemType: 4
   _size: {x: 2, y: 2}
   _name: Purple Pink
   _description: This is a test 2x2 purple and pink item
