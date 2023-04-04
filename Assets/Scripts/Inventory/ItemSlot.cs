@@ -47,10 +47,8 @@ public class ItemSlot : MonoBehaviour {
         SpritePosition = spritePosition;
 
         itemImage.enabled = (itemType != ItemType.NULL);
-        if (itemType != ItemType.NULL) {
-            itemImage.sprite = inventoryManager.Items[itemType][SpritePosition.x, SpritePosition.y];
-        }
-    }
+		itemImage.sprite = inventoryManager.Items[itemType][SpritePosition.x, SpritePosition.y];
+	}
 
     private void OnMouseDown ( ) {
         inventoryManager.InteractWithItemSlot(this);

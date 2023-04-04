@@ -4285,7 +4285,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Padding:
-    m_Left: 45
+    m_Left: 40
     m_Right: 0
     m_Top: 0
     m_Bottom: 0
@@ -8594,13 +8594,14 @@ MonoBehaviour:
   cursorItemSlotTransform: {fileID: 47863686}
   inventoryCursor: {fileID: 47863688}
   _items:
-    m_keys: 0000000001000000020000000300000004000000
+    m_keys: 000000000100000002000000030000000400000005000000
     m_values:
     - {fileID: 11400000, guid: a242e9278a6bbaf43ae716d32cdd0781, type: 2}
     - {fileID: 11400000, guid: 464e77064be75df479b4eeff453cea75, type: 2}
     - {fileID: 11400000, guid: 8b1f9f5e4e49a234c96f6b7f0df4acad, type: 2}
     - {fileID: 11400000, guid: b37699c1cf8e1aa46a6feb91690d18b4, type: 2}
     - {fileID: 11400000, guid: eed50b0acbcf3194b966b8740484db15, type: 2}
+    - {fileID: 11400000, guid: e234f0c706e8faa44832e3acd226d8ca, type: 2}
   _heldItemType: 0
   _inventoryWidth: 8
   _inventoryHeight: 8
@@ -9251,6 +9252,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4f231c4fb786f3946a6b90b886c48677, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  m_SendPointerHoverToParent: 1
   m_HorizontalAxis: Horizontal
   m_VerticalAxis: Vertical
   m_SubmitButton: Submit

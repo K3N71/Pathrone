@@ -13,7 +13,8 @@ public enum ItemType {
     TEST_RED,
     TEST_GREEN,
     TEST_BLUE,
-    TEST_PURPLEPINK
+    TEST_PURPLEPINK,
+    TEST_YELLOW
 }
 
 public class InventoryManager : MonoBehaviour {
@@ -88,7 +89,7 @@ public class InventoryManager : MonoBehaviour {
         InsertItem(ItemType.TEST_PURPLEPINK);
         InsertItem(ItemType.TEST_BLUE);
         InsertItem(ItemType.TEST_GREEN);
-        InsertItem(ItemType.TEST_GREEN);
+        InsertItem(ItemType.TEST_YELLOW);
     }
     #endregion
 
