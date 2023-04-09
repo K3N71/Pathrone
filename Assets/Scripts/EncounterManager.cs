@@ -23,8 +23,8 @@ public class EncounterManager : MonoBehaviour
     private GameObject menu3;
     [SerializeField, Description("Menu Object 4")]
     private GameObject menu4;
-    private List<string> menuData = new List<string>();
-    private List<int> statChanges = new List<int>();
+    private List<(string, string)> menuData = new List<(string, string)>();
+    private List<Stats> statChanges = new List<Stats>();
 
     [Header("Encounter Variables.")]
     [SerializeField, Description("Frequency of Encounters.")]
@@ -142,51 +142,37 @@ public class EncounterManager : MonoBehaviour
     {
         // Clears any previous data
         menuData.Clear();
-        statChanges.Clear();
         
         // Get new data
         encounter.GetComponent<Encounter>().getStats(player.GetComponent<Player>());
-        (string, List<string>, List<int>) data = encounter.GetComponent<Encounter>().encounterInfo();
+        (string, List<(string, string)>, List<Stats>) data = encounter.GetComponent<Encounter>().encounterInfo();
 
-        // Check if encounter is formatted properly, if not throw error encounter
-        if (data.Item2.Count != data.Item3.Count || data.Item2.Count % 2 != 0 || data.Item3.Count % 2 != 0)
-        {
-            text.text = "Something went wrong and an event was formatted improperly.";
-            menu1.SetActive(true);
-            menu1.transform.GetChild(0).GetComponent<Button>().GetComponent<TextMeshProUGUI>().text = "Exit";
-            menu1.transform.GetChild(1).GetComponent<TextMeshProUGUI>().text = "";
-            statChanges.Add(0);
-            statChanges.Add(0);
-        }
-        // otherwise fill it out, if there are a certain amount of options, add the respective buttons.
-        else
-        {
-            text.text = data.Item1;
-            menuData = data.Item2;
-            statChanges = data.Item3;
-            menu1.transform.GetChild(0).GetComponentInChildren<TextMeshProUGUI>().text = menuData[0];
-            menu1.transform.GetChild(1).GetComponent<TextMeshProUGUI>().text = menuData[1];
-            menu1.SetActive(true);
+        text.text = data.Item1;
+        menuData = data.Item2;
+        statChanges = data.Item3;
+        menu1.transform.GetChild(0).GetComponentInChildren<TextMeshProUGUI>().text = menuData[0].Item1;
+        menu1.transform.GetChild(1).GetComponent<TextMeshProUGUI>().text = menuData[0].Item2;
+        menu1.SetActive(true);
 
-            if (menuData.Count > 2)
-            {
-                menu2.transform.GetChild(0).GetComponentInChildren<TextMeshProUGUI>().text = menuData[2];
-                menu2.transform.GetChild(1).GetComponent<TextMeshProUGUI>().text = menuData[3];
-                menu2.SetActive(true);
-            }
-            if (menuData.Count > 4)
-            {
-                menu3.transform.GetChild(0).GetComponentInChildren<TextMeshProUGUI>().text = menuData[4];
-                menu3.transform.GetChild(1).GetComponent<TextMeshProUGUI>().text = menuData[5];
-                menu3.SetActive(true);
-            }
-            if (menuData.Count > 6)
-            {
-                menu4.transform.GetChild(0).GetComponentInChildren<TextMeshProUGUI>().text = menuData[6];
-                menu4.transform.GetChild(1).GetComponent<TextMeshProUGUI>().text = menuData[7];
-                menu4.SetActive(true);
-            }
+        if (menuData.Count > 1)
+        {
+            menu2.transform.GetChild(0).GetComponentInChildren<TextMeshProUGUI>().text = menuData[1].Item1;
+            menu2.transform.GetChild(1).GetComponent<TextMeshProUGUI>().text = menuData[1].Item2;
+            menu2.SetActive(true);
         }
+        if (menuData.Count > 2)
+        {
+            menu3.transform.GetChild(0).GetComponentInChildren<TextMeshProUGUI>().text = menuData[2].Item1;
+            menu3.transform.GetChild(1).GetComponent<TextMeshProUGUI>().text = menuData[2].Item2;
+            menu3.SetActive(true);
+        }
+        if (menuData.Count > 3)
+        {
+            menu4.transform.GetChild(0).GetComponentInChildren<TextMeshProUGUI>().text = menuData[3].Item1;
+            menu4.transform.GetChild(1).GetComponent<TextMeshProUGUI>().text = menuData[3].Item2;
+            menu4.SetActive(true);
+        }
+        
     }
 
     /// <summary>
@@ -254,8 +240,7 @@ public class EncounterManager : MonoBehaviour
     // After, hide all menu buttons and change the game state back to game.
     public void OnClick1()
     {
-        player.GetComponent<Player>().HP += statChanges[0];
-        player.GetComponent<Player>().Stamina += statChanges[1];
+        player.GetComponent<Player>().Stats = statChanges[0];
         menu1.SetActive(false);
         menu2.SetActive(false);
         menu3.SetActive(false);
@@ -265,8 +250,7 @@ public class EncounterManager : MonoBehaviour
     }
     public void OnClick2()
     {
-        player.GetComponent<Player>().HP += statChanges[2];
-        player.GetComponent<Player>().Stamina += statChanges[3];
+        player.GetComponent<Player>().Stats = statChanges[1];
         menu1.SetActive(false);
         menu2.SetActive(false);
         menu3.SetActive(false);
@@ -276,8 +260,7 @@ public class EncounterManager : MonoBehaviour
     }
     public void OnClick3()
     {
-        player.GetComponent<Player>().HP += statChanges[4];
-        player.GetComponent<Player>().Stamina += statChanges[5];
+        player.GetComponent<Player>().Stats = statChanges[2];
         menu1.SetActive(false);
         menu2.SetActive(false);
         menu3.SetActive(false);
@@ -287,8 +270,7 @@ public class EncounterManager : MonoBehaviour
     }
     public void OnClick4()
     {
-        player.GetComponent<Player>().HP += statChanges[6];
-        player.GetComponent<Player>().Stamina += statChanges[7];
+        player.GetComponent<Player>().Stats = statChanges[3];
         menu1.SetActive(false);
         menu2.SetActive(false);
         menu3.SetActive(false);

@@ -16,63 +16,18 @@ public class Player : MonoBehaviour
 
     [Header("Stats")]
     [SerializeField]
-    private int strength = 5;
-    [SerializeField]
-    private int knowledge = 5;
-    [SerializeField]
-    private int intuition = 5;
-    [SerializeField]
-    private int luck = 5;
-    [SerializeField]
-    private int longevity = 5;
-    [SerializeField]
-    private int maxHP;
-    [SerializeField]
-    private int maxStamina;
-    [SerializeField]
-    private int currentHP;
-    [SerializeField]
-    private int currentStamina;
-
-    public int Strength
+    private Stats stats;
+    public Stats Stats
     {
-        get { return strength; }
-    }
-    public int Knowledge
-    {
-        get { return knowledge; }
-    }
-    public int Intuition
-    {
-        get { return intuition; }
-    }
-    public int Luck
-    {
-        get { return luck; }
-    }
-    public int Longevity
-    {
-        get { return longevity; }
-    }
-    public int HP
-    {
-        get { return currentHP; }
-        set { currentHP = value; }
-    }
-    public int Stamina
-    {
-        get { return currentStamina; }
-        set { currentStamina = value; }
+        get { return stats; }
+        set { stats = value; }
     }
 
     // Start is called before the first frame update
     void Start()
     {
         bounceTimer = bounceRate;
-        maxHP = longevity * 5;
-        currentHP = maxHP;
-        maxStamina = longevity * 5;
-        currentStamina = maxStamina;
+        stats = new Stats();
     }
 
     // Update is called once per frame
