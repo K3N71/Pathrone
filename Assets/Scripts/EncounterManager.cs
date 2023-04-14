@@ -15,6 +15,8 @@ public class EncounterManager : MonoBehaviour
     private GameObject player;
     [SerializeField, Description("Text Object")]
     private TextMeshProUGUI text;
+    [SerializeField, Description("Stats Display")]
+    private TextMeshProUGUI statsDisplay;
     [SerializeField, Description("Menu Object 1")]
     private GameObject menu1;
     [SerializeField, Description("Menu Object 2")]
@@ -31,7 +33,7 @@ public class EncounterManager : MonoBehaviour
     private float encounterRate = 12.0f;
     private float encounterTimer;
     [SerializeField, Description("Encounter move speed.")]
-    private float encounterMoveSpeed = 10.0f;
+    private float encounterMoveSpeed = 3.0f;
 
     [SerializeField, Description("Encounter Queue")]
     private Queue<GameObject> encounterQueue = new Queue<GameObject>();
@@ -40,7 +42,7 @@ public class EncounterManager : MonoBehaviour
     [SerializeField, Description("Encounter Prefabs")]
     private List<GameObject> prefabList = new List<GameObject>();
 
-    
+    private List<string> resultingText = new List<string>();
 
     // Start is called before the first frame update
     void Start()
@@ -50,8 +52,9 @@ public class EncounterManager : MonoBehaviour
         menu2.SetActive(false);
         menu3.SetActive(false);
         menu4.SetActive(false);
-        text.text = "Welcome to our game, Pathrone! This is a proof of concept MVI. When the grey square hits your cube, you will enter an encounter.";
-    }
+        text.text = "Welcome to our game, Pathrone! When the colored cube hits your cube, you will enter an encounter.";
+        
+}
 
     // Update is called once per frame
     void Update()
@@ -59,11 +62,29 @@ public class EncounterManager : MonoBehaviour
         // Code that occurs during the game.
         if (globals.CurrentState == GameState.Game)
         {
-            // Make sure the game has a queue of 5 events to peek at.
-            if (encounterQueue.Count < 5)
+            statsDisplay.text = $"Player Stats\n" +
+                $"HP: {player.GetComponent<Player>().Stats.HP} / {player.GetComponent<Player>().Stats.Longevity * 4}\n" +
+                $"Stamina: {player.GetComponent<Player>().Stats.Stamina} / {player.GetComponent<Player>().Stats.Longevity * 4}\n" +
+                $"Strength: {player.GetComponent<Player>().Stats.Strength}\n" +
+                $"Knowledge: {player.GetComponent<Player>().Stats.Knowledge}\n" +
+                $"Intuition: {player.GetComponent<Player>().Stats.Intuition}\n" +
+                $"Luck: {player.GetComponent<Player>().Stats.Luck}";
+
+            // Make sure the game has a queue of 5 events to peek at. Need to fix pool code, is not working.
+            if (encounterQueue.Count < 1)
             {
                 // Once other events are made, generate pseudorandomly
-                encounterQueue.Enqueue(getEncounter(EncounterType.Test));
+                switch (UnityEngine.Random.Range(0, 2))
+                {
+                    case 0:
+                        encounterQueue.Enqueue(getEncounter(EncounterType.Attack));
+                        if (globals.Debug) Debug.Log("adding attack encounter");
+                        break;
+                    case 1:
+                        encounterQueue.Enqueue(getEncounter(EncounterType.CityTown));
+                        if (globals.Debug) Debug.Log("adding city encounter");
+                        break;
+                }
             }
 
             // Every X amount of seconds, where X is encounterRate, send an encounter towards the player.
@@ -112,19 +133,19 @@ public class EncounterManager : MonoBehaviour
             encounter = this.transform.GetChild(getFirstOfType(type)).gameObject;
             if (encounter.activeInHierarchy)
             {
-                encounter = Instantiate(prefabList[typeToIndex(type)], new Vector3(this.transform.position.x, this.transform.position.y, 0.0f), Quaternion.identity);
+                encounter = Instantiate(prefabList[typeToIndex(type)], new Vector3(this.transform.position.x, this.transform.position.y, 93.7f), Quaternion.identity);
                 encounter.transform.SetParent(this.transform);
             }
             else
             {
-                encounter.transform.position = new Vector3(this.transform.position.x, this.transform.position.y, 0.0f);
+                encounter.transform.position = new Vector3(this.transform.position.x, this.transform.position.y, 93.7f);
                 encounter.SetActive(true);
             }
         }
         // if no encounters in pool, makes a new one
         else
         {
-            encounter = Instantiate(prefabList[typeToIndex(type)], new Vector3(this.transform.position.x, this.transform.position.y, 0.0f), Quaternion.identity);
+            encounter = Instantiate(prefabList[typeToIndex(type)], new Vector3(this.transform.position.x, this.transform.position.y, 93.7f), Quaternion.identity);
             encounter.transform.SetParent(this.transform);
         }
 
@@ -142,14 +163,17 @@ public class EncounterManager : MonoBehaviour
     {
         // Clears any previous data
         menuData.Clear();
-        
+        resultingText.Clear();
+        statChanges.Clear();
+
         // Get new data
         encounter.GetComponent<Encounter>().getStats(player.GetComponent<Player>());
-        (string, List<(string, string)>, List<Stats>) data = encounter.GetComponent<Encounter>().encounterInfo();
+        (string, List<(string, string)>, List<string>, List<Stats>) data = encounter.GetComponent<Encounter>().encounterInfo();
 
         text.text = data.Item1;
         menuData = data.Item2;
-        statChanges = data.Item3;
+        resultingText = data.Item3;
+        statChanges = data.Item4;
         menu1.transform.GetChild(0).GetComponentInChildren<TextMeshProUGUI>().text = menuData[0].Item1;
         menu1.transform.GetChild(1).GetComponent<TextMeshProUGUI>().text = menuData[0].Item2;
         menu1.SetActive(true);
@@ -213,8 +237,10 @@ public class EncounterManager : MonoBehaviour
     {
         switch(type)
         {
-            case EncounterType.Test:
-                return 0;
+            case EncounterType.Attack:
+                return 1;
+            case EncounterType.CityTown:
+                return 2;
             default:
                 return 0;
         }
@@ -228,8 +254,10 @@ public class EncounterManager : MonoBehaviour
     {
         switch (index)
         {
-            case 0:
-                return EncounterType.Test;
+            case 1:
+                return EncounterType.Attack;
+            case 2:
+                return EncounterType.CityTown;
             default:
                 return EncounterType.Test;
         }
@@ -245,6 +273,7 @@ public class EncounterManager : MonoBehaviour
         menu2.SetActive(false);
         menu3.SetActive(false);
         menu4.SetActive(false);
+        text.text = resultingText[0];
         globals.CurrentState = GameState.Game;
         encounterQueue.Dequeue().SetActive(false);
     }
@@ -255,6 +284,7 @@ public class EncounterManager : MonoBehaviour
         menu2.SetActive(false);
         menu3.SetActive(false);
         menu4.SetActive(false);
+        text.text = resultingText[1];
         globals.CurrentState = GameState.Game;
         encounterQueue.Dequeue().SetActive(false);
     }
@@ -265,6 +295,7 @@ public class EncounterManager : MonoBehaviour
         menu2.SetActive(false);
         menu3.SetActive(false);
         menu4.SetActive(false);
+        text.text = resultingText[2];
         globals.CurrentState = GameState.Game;
         encounterQueue.Dequeue().SetActive(false);
     }
@@ -275,6 +306,7 @@ public class EncounterManager : MonoBehaviour
         menu2.SetActive(false);
         menu3.SetActive(false);
         menu4.SetActive(false);
+        text.text = resultingText[3];
         globals.CurrentState = GameState.Game;
         encounterQueue.Dequeue().SetActive(false);
     }

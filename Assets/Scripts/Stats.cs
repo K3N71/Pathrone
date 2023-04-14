@@ -8,11 +8,19 @@ public class Stats
 
     public Stats()
     {
-        stats[0] = Random.Range(3, 8); // strength
-        stats[1] = Random.Range(3, 8); // knowledge
-        stats[2] = Random.Range(3, 8); // intuition
-        stats[3] = Random.Range(3, 8); // luck
-        stats[4] = Random.Range(3, 8); // longevity
+        stats[0] = 3; // strength
+        stats[1] = 3; // knowledge
+        stats[2] = 3; // intuition
+        stats[3] = 3; // luck
+        stats[4] = 3; // longevity
+        for (int i = 0; i < 10; i++)
+        {
+            int statToAllocate = Random.Range(0, 5);
+            if (stats[statToAllocate] < 8)
+                stats[statToAllocate]++;
+            else
+                i--;
+        }
         stats[5] = stats[4] * 4;       // max HP
         stats[6] = stats[4] * 4;       // max stamina
         stats[7] = stats[5];           // current HP
@@ -39,8 +47,8 @@ public class Stats
         stats[4] = copy.Longevity ; // longevity
         stats[5] = stats[4] * 4;    // max HP
         stats[6] = stats[4] * 4;    // max stamina
-        stats[7] = stats[5];        // current HP
-        stats[8] = stats[6];        // current stamina
+        stats[7] = copy.HP;        // current HP
+        stats[8] = copy.Stamina;        // current stamina
     }
 
     public int Strength
@@ -76,11 +84,19 @@ public class Stats
     public int HP
     {
         get { return stats[7]; }
-        set { stats[7] = value; }
+        set
+        { 
+            stats[7] = value;
+            if (stats[7] > stats[4] * 4) stats[7] = stats[4] * 4;
+        }
     }
     public int Stamina
     {
         get { return stats[8]; }
-        set { stats[8] = value; }
+        set 
+        { 
+            stats[8] = value;
+            if (stats[8] > stats[4] * 4) stats[8] = stats[4] * 4;
+        }
     }
 }
