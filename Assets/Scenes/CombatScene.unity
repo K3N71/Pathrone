@@ -588,7 +588,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1282804006}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1838178350}
+        m_TargetAssemblyTypeName: CombatManager, Assembly-CSharp
+        m_MethodName: Attack
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1282804006
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1028,6 +1040,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   slider: {fileID: 1786737334}
   text: {fileID: 1462393053}
+  valueIncrement: 0
 --- !u!1 &1837269471
 GameObject:
   m_ObjectHideFlags: 0
@@ -1074,6 +1087,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1838178349}
+  - component: {fileID: 1838178350}
   m_Layer: 0
   m_Name: CombatManager
   m_TagString: Untagged
@@ -1096,6 +1110,19 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1838178350
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1838178348}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 55e55d752447674468c21751e3533577, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  slider: {fileID: 1786737335}
 --- !u!1 &1916675092
 GameObject:
   m_ObjectHideFlags: 0
