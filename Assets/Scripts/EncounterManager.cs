@@ -71,7 +71,7 @@ public class EncounterManager : MonoBehaviour
                 $"Luck: {player.GetComponent<Player>().Stats.Luck}";
 
             // Make sure the game has a queue of 5 events to peek at. Need to fix pool code, is not working.
-            if (encounterQueue.Count < 1)
+            if (encounterQueue.Count < 5  && player.GetComponent<Player>())
             {
                 // Once other events are made, generate pseudorandomly
                 switch (UnityEngine.Random.Range(0, 2))
@@ -112,6 +112,10 @@ public class EncounterManager : MonoBehaviour
                 }
             }
             
+            if (player.GetComponent<Player>().Stats.HP <= 0)
+            {
+                globals.CurrentState = GameState.MainMenu;
+            }
         }
     }
 
@@ -151,7 +155,7 @@ public class EncounterManager : MonoBehaviour
 
         // brings encounter to the end of the encounter pool.
         encounter.transform.SetAsLastSibling();
-        encounter.GetComponent<Encounter>().getStats(player.GetComponent<Player>());
+        encounter.GetComponent<Encounter>().player = player.GetComponent<Player>();
         return encounter;
     }
 
@@ -167,7 +171,6 @@ public class EncounterManager : MonoBehaviour
         statChanges.Clear();
 
         // Get new data
-        encounter.GetComponent<Encounter>().getStats(player.GetComponent<Player>());
         (string, List<(string, string)>, List<string>, List<Stats>) data = encounter.GetComponent<Encounter>().encounterInfo();
 
         text.text = data.Item1;
