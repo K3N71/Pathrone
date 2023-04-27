@@ -8,19 +8,24 @@ public class CityEncounters : Encounters
 {
     public CityEncounters(Stats playerStats)
     {
+        seed = rand.Next(6);
+        check = (float)rand.NextDouble();
         UpdateStats(playerStats);
+    }
+
+    protected override void generateEncounter()
+    {
         descText = "";
         choices = new List<(string, string)>();
         results = new List<string>();
         statChanges = new List<Stats>();
-
-        switch (Random.Range(0, 6))
+        switch (seed)
         {
             case 0:// Desert City
                 {
                     descText = "You encounter a desert city.";
-                    choices.Add(("Practice Fighting.", ""));
-                    int chance = Random.Range(0, 100);
+                    choices.Add(("Practice Fighting.", ""));    
+                    int chance = Mathf.RoundToInt(100 * check);
                     if (chance < 75)
                     {
                         int strengthGain = Random.Range(1, 3);
@@ -75,7 +80,7 @@ public class CityEncounters : Encounters
                 {
                     descText = "You encounter a forest city.";
                     choices.Add(("Practice Fighting.", ""));
-                    int chance = Random.Range(0, 100);
+                    int chance = Mathf.RoundToInt(100 * check);
                     if (chance < 100)
                     {
                         int strengthGain = Random.Range(1, 3);
@@ -130,7 +135,7 @@ public class CityEncounters : Encounters
                 {
                     descText = "You encounter a mountain city.";
                     choices.Add(("Practice Fighting.", ""));
-                    int chance = Random.Range(0, 100);
+                    int chance = Mathf.RoundToInt(100 * check);
                     if (chance < 80)
                     {
                         int strengthGain = Random.Range(1, 3);
@@ -185,7 +190,7 @@ public class CityEncounters : Encounters
                 {
                     descText = "You encounter a desolate city.";
                     choices.Add(("Practice Fighting.", ""));
-                    int chance = Random.Range(0, 100);
+                    int chance = Mathf.RoundToInt(100 * check);
                     if (chance < 25)
                     {
                         int strengthGain = Random.Range(1, 3);
@@ -240,7 +245,7 @@ public class CityEncounters : Encounters
                 {
                     descText = "You encounter a lakeside city.";
                     choices.Add(("Practice Fighting.", ""));
-                    int chance = Random.Range(0, 100);
+                    int chance = Mathf.RoundToInt(100 * check);
                     if (chance < 90)
                     {
                         int strengthGain = Random.Range(1, 3);
@@ -295,7 +300,7 @@ public class CityEncounters : Encounters
                 {
                     descText = "You encounter an oceanside city.";
                     choices.Add(("Practice Fighting.", ""));
-                    int chance = Random.Range(0, 100);
+                    int chance = Mathf.RoundToInt(100 * check);
                     if (chance < 100)
                     {
                         int strengthGain = Random.Range(1, 3);

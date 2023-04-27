@@ -9,8 +9,6 @@ public class Encounter : MonoBehaviour
     // Initialize in Encounter Prefab please!
     [SerializeField, Description("Type of Encounter.")]
     private EncounterType type;
-    [SerializeField, Description("Player Reference")]
-    public Player player;
 
     private Encounters encounters;
     private (string, List<(string, string)>, List<string>, List<Stats>) responseObject;
@@ -35,6 +33,11 @@ public class Encounter : MonoBehaviour
     void OnEnable()
     {
         send = false;   
+    }
+
+    public void setStats(Stats stats)
+    {
+        playerStats = stats;
         // Item 1 is the text displayed in the large text box in the play area
         // Item 2 is the list of actions + the intuition text. Right now there are only 4 menu buttons so please don't go above count = 4.
         // Item 3 is the list of results from the player's choices.
@@ -80,16 +83,12 @@ public class Encounter : MonoBehaviour
                 break;
         }
     }
-
-    void Update()
+    public void updateStats(Stats stats)
     {
-        if (playerStats != player.Stats)
-        {
-            playerStats = player.Stats;
-            encounters.UpdateStats(playerStats);
-        }
+        playerStats = stats;
+        encounters.UpdateStats(playerStats);
+        responseObject = (encounters.DescText, encounters.Choices, encounters.Results, encounters.StatChanges);
     }
-    
     /// <summary>
     /// Returns the prompt and the corresponding actions.
     /// </summary>

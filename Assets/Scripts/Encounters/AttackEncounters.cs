@@ -7,19 +7,24 @@ public class AttackEncounters : Encounters
 {
     public AttackEncounters(Stats playerStats)
     {
+        seed = rand.Next(5);
+        check = (float)rand.NextDouble();
         UpdateStats(playerStats);
+    }
+
+    protected override void generateEncounter()
+    {
         descText = "";
         choices = new List<(string, string)>();
         results = new List<string>();
         statChanges = new List<Stats>();
-
-        switch (Random.Range(0, 5))
+        switch (seed)
         {
             case 0:// strong enemy attacks
                 {
                     descText = "Strong enemy attacks.";
                     choices.Add(("Push it aside.", ""));
-                    int strengthCheck = Random.Range(7, 15);
+                    int strengthCheck = 7 + Mathf.RoundToInt(8 * check);
                     if (stats.Strength > strengthCheck)
                     {
                         results.Add("You succeed in defeating the strong enemy, but it took some effort. -3 Stamina");
@@ -36,7 +41,7 @@ public class AttackEncounters : Encounters
                     }
 
                     choices.Add(("Dodge the attack.", ""));
-                    int intuitionLuckCheck = Random.Range(1, 10);
+                    int intuitionLuckCheck = 1 + Mathf.RoundToInt(7 * check);
                     if (stats.Intuition + stats.Luck > intuitionLuckCheck)
                     {
                         results.Add("You dodge its attack and quickly escape.");
@@ -52,7 +57,7 @@ public class AttackEncounters : Encounters
                     }
 
                     choices.Add(("Try and find a weak spot.", ""));
-                    int knowledgeIntuitionCheck = Random.Range(1, 12);
+                    int knowledgeIntuitionCheck = 1 + Mathf.RoundToInt(11 * check);
                     if (stats.Knowledge + stats.Intuition > knowledgeIntuitionCheck)
                     {
                         results.Add("You find its weakness and swiftly take it down. Exploiting the weakness permanently earns you +1 Knowledge and Intuition.");
@@ -75,7 +80,7 @@ public class AttackEncounters : Encounters
                 {
                     descText = "Smart enemy attacks.";
                     choices.Add(("Push it aside.", ""));
-                    int strengthCheck = Random.Range(1, 8);
+                    int strengthCheck = 1 + Mathf.RoundToInt(7 * check);
                     if (stats.Strength > strengthCheck)
                     {
                         results.Add("You succeed in defeating the smart enemy, but it took some effort. -3 Stamina");
@@ -92,7 +97,7 @@ public class AttackEncounters : Encounters
                     }
 
                     choices.Add(("Dodge the attack.", ""));
-                    int intuitionLuckCheck = Random.Range(10, 20);
+                    int intuitionLuckCheck = 10 + Mathf.RoundToInt(10 * check);
                     if (stats.Intuition + stats.Luck > intuitionLuckCheck)
                     {
                         results.Add("You dodge its attack and quickly escape.");
@@ -108,7 +113,7 @@ public class AttackEncounters : Encounters
                     }
 
                     choices.Add(("Try and find a weak spot.", ""));
-                    int knowledgeIntuitionCheck = Random.Range(6, 18);
+                    int knowledgeIntuitionCheck = 6 + Mathf.RoundToInt(12 * check);
                     if (stats.Knowledge + stats.Intuition > knowledgeIntuitionCheck)
                     {
                         results.Add("You find its weakness and swiftly take it down. Exploiting the weakness permanently earns you +1 Knowledge and Intuition.");
@@ -130,7 +135,7 @@ public class AttackEncounters : Encounters
                 {
                     descText = "Multiple enemies attack.";
                     choices.Add(("Outlast the onslaught.", ""));
-                    int strengthCheck = Random.Range(5, 15);
+                    int strengthCheck = 5 + Mathf.RoundToInt(10 * check);
                     if (stats.Strength > strengthCheck)
                     {
                         results.Add("You succeed in defending against the enemies, but it took some effort. -3 Stamina");
@@ -147,7 +152,7 @@ public class AttackEncounters : Encounters
                     }
 
                     choices.Add(("Roll out of the way.", ""));
-                    int intuitionLuckCheck = Random.Range(10, 18);
+                    int intuitionLuckCheck = 10 + Mathf.RoundToInt(8 * check);
                     if (stats.Intuition + stats.Luck > intuitionLuckCheck)
                     {
                         results.Add("You dodge the attack and quickly escape.");
@@ -163,7 +168,7 @@ public class AttackEncounters : Encounters
                     }
 
                     choices.Add(("Look around for cover.", ""));
-                    int knowledgeIntuitionCheck = Random.Range(3, 15);
+                    int knowledgeIntuitionCheck = 3 + Mathf.RoundToInt(12 * check);
                     if (stats.Knowledge + stats.Intuition > knowledgeIntuitionCheck)
                     {
                         results.Add("You find cover and it greatly assists in your fight. Making the most out of your surroundings permanently earns you +1 Knowledge and Intuition.");
@@ -185,7 +190,7 @@ public class AttackEncounters : Encounters
                 {
                     descText = "Disguised enemy approaches!";
                     choices.Add(("Take off their mask.", ""));
-                    int strengthLuckCheck = Random.Range(5, 15);
+                    int strengthLuckCheck = 5 + Mathf.RoundToInt(10 * check);
                     if (stats.Strength + stats.Luck > strengthLuckCheck)
                     {
                         results.Add("You succeed in taking off the enemy's mask and they flee to protect their identity.");
@@ -201,7 +206,7 @@ public class AttackEncounters : Encounters
                     }
 
                     choices.Add(("Just walk away.", ""));
-                    int luckCheck = Random.Range(1, 8);
+                    int luckCheck = 1 + Mathf.RoundToInt(7 * check);
                     if (stats.Luck > luckCheck)
                     {
                         results.Add("They fail to recognize you and walk in the other direction.");
@@ -217,7 +222,7 @@ public class AttackEncounters : Encounters
                     }
 
                     choices.Add(("Challenge them to a duel.", ""));
-                    int intuitionLuckCheck = Random.Range(10, 20);
+                    int intuitionLuckCheck = 10 + Mathf.RoundToInt(10 * check);
                     if (stats.Intuition + stats.Luck > intuitionLuckCheck)
                     {
                         results.Add("You succeed in your challenge and make a fool out of the enemy. The amazing performance you displayed permanently earns you +1 Strength, Knowledge, and Luck.");
@@ -242,7 +247,7 @@ public class AttackEncounters : Encounters
                     choices.Add(("Play Strong Rock.", ""));
                     choices.Add(("Play Smart Scissors.", ""));
                     choices.Add(("Play Sensing Paper.", ""));
-                    switch (Random.Range(0, 3))
+                    switch (Mathf.RoundToInt(3 * check))
                     {
                         case 0: // rock win, scissor ties, paper loses
                             {
@@ -292,7 +297,7 @@ public class AttackEncounters : Encounters
                     }
 
                     choices.Add(("Kick him in the face.", ""));
-                    int strengthKnowledgeIntuitionLuckCheck = Random.Range(20, 30);
+                    int strengthKnowledgeIntuitionLuckCheck = 20 + Mathf.RoundToInt(10 * check);
                     if (stats.Strength + stats.Knowledge + stats.Intuition + stats.Luck > strengthKnowledgeIntuitionLuckCheck)
                     {
                         results.Add("You succeed and mock the man for his foolish challenge. Your bravado permanently earns you +2 Strength, Knowledge, Intuition, and Luck.");
