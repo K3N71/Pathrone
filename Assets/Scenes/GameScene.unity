@@ -1732,7 +1732,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1194152202}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: -9, y: -3.37, z: 93.1}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -1753,7 +1753,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   globals: {fileID: 211693271}
-  player: {fileID: 1923994957}
+  player: {fileID: 1923994959}
   text: {fileID: 730747304}
   statsDisplay: {fileID: 1273539516}
   menu1: {fileID: 2021543692}
@@ -2584,11 +2584,17 @@ RectTransform:
   m_AnchoredPosition: {x: 510, y: 0}
   m_SizeDelta: {x: 160, y: 80}
   m_Pivot: {x: 0, y: 0}
---- !u!1 &1923994957 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 5667949306400091851, guid: 4db8b704979ff6949a777dc07072c926, type: 3}
+--- !u!114 &1923994959 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: -4926746126854852964, guid: 4db8b704979ff6949a777dc07072c926, type: 3}
   m_PrefabInstance: {fileID: 45562991}
   m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7b871079ca2ea104a99c02d51fa5575b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &2014510543
 GameObject:
   m_ObjectHideFlags: 0
