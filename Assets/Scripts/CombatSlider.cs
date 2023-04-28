@@ -11,6 +11,7 @@ public class CombatSlider : MonoBehaviour
 
     private bool isNegative = false;
     [SerializeField] private float valueIncrement = 0;
+    const float baseFontSize = 36;
 
     // Start is called before the first frame update
     void Start()
@@ -70,18 +71,25 @@ public class CombatSlider : MonoBehaviour
     {
         if (value >= -0.15f && value <= 0.15f)
         {
+            text.fontSize = baseFontSize*1.5f;
             text.color = Color.green;
         }
         else if (value >= -0.25f && value <= 0.25f)
         {
+            text.fontSize = baseFontSize*1.35f;
             text.color = Color.yellow;
+
         }
         else if (value >= -0.5f && value <= 0.5f)
         {
+            text.fontSize = baseFontSize * 1.1f;
             text.color = Color.red;
+            // smaller font size
         }
         else
         {
+            text.fontSize = baseFontSize;
+            // smallest font size
             text.color = Color.white;
         }
     }
