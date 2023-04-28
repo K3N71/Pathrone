@@ -1,6 +1,6 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
 
 public class Stats
 {
@@ -15,7 +15,8 @@ public class Stats
         stats[4] = 3; // longevity
         for (int i = 0; i < 10; i++)
         {
-            int statToAllocate = Random.Range(0, 5);
+            Random rand = new Random();
+            int statToAllocate = rand.Next(0, 5);
             if (stats[statToAllocate] < 8)
                 stats[statToAllocate]++;
             else

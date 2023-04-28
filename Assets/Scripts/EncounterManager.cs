@@ -12,7 +12,7 @@ public class EncounterManager : MonoBehaviour
     [SerializeField, Description("Globals Object")]
     private Globals globals;
     [SerializeField, Description("Player Object")]
-    private GameObject player;
+    private Player player;
     [SerializeField, Description("Text Object")]
     private TextMeshProUGUI text;
     [SerializeField, Description("Stats Display")]
@@ -62,27 +62,27 @@ public class EncounterManager : MonoBehaviour
         // Code that occurs during the game.
         if (globals.CurrentState == GameState.Game)
         {
-            statsDisplay.text = $"Player Stats\n" +
-                $"HP: {player.GetComponent<Player>().Stats.HP} / {player.GetComponent<Player>().Stats.Longevity * 4}\n" +
-                $"Stamina: {player.GetComponent<Player>().Stats.Stamina} / {player.GetComponent<Player>().Stats.Longevity * 4}\n" +
-                $"Strength: {player.GetComponent<Player>().Stats.Strength}\n" +
-                $"Knowledge: {player.GetComponent<Player>().Stats.Knowledge}\n" +
-                $"Intuition: {player.GetComponent<Player>().Stats.Intuition}\n" +
-                $"Luck: {player.GetComponent<Player>().Stats.Luck}";
+            statsDisplay.text = $"Player Stats\n" + 
+                $"HP: {player.Stats.HP} / {player.Stats.Longevity * 4}\n" +
+                $"Stamina: {player.Stats.Stamina} / {player.Stats.Longevity * 4}\n" +
+                $"Strength: {player.Stats.Strength}\n" +
+                $"Knowledge: {player.Stats.Knowledge}\n" +
+                $"Intuition: {player.Stats.Intuition}\n" +
+                $"Luck: {player.Stats.Luck}";
 
             // Make sure the game has a queue of 5 events to peek at. Need to fix pool code, is not working.
-            if (encounterQueue.Count < 1)
+            if (encounterQueue.Count < 5)
             {
                 // Once other events are made, generate pseudorandomly
                 switch (UnityEngine.Random.Range(0, 2))
                 {
                     case 0:
                         encounterQueue.Enqueue(getEncounter(EncounterType.Attack));
-                        if (globals.Debug) Debug.Log("adding attack encounter");
+                        //if (globals.Debug) Debug.Log("adding attack encounter");
                         break;
                     case 1:
                         encounterQueue.Enqueue(getEncounter(EncounterType.CityTown));
-                        if (globals.Debug) Debug.Log("adding city encounter");
+                        //if (globals.Debug) Debug.Log("adding city encounter");
                         break;
                 }
             }
@@ -104,14 +104,18 @@ public class EncounterManager : MonoBehaviour
                     moving.x += encounterMoveSpeed * Time.deltaTime;
                     encounter.transform.localPosition = moving;
                 }
-                if (encounterQueue.Peek().transform.localPosition.x >= 10.0f)
+                if (encounter.transform.localPosition.x >= 10.0f)
                 {
-                    if (globals.Debug) Debug.Log("Hey it touched.");
                     globals.CurrentState = GameState.Encounter;
+                    if (globals.Debug) Debug.Log("Hey it touched.");
                     triggerEncounter(encounterQueue.Peek().GetComponent<Encounter>());
                 }
             }
             
+            if (player.Stats.HP <= 0)
+            {
+                globals.CurrentState = GameState.MainMenu;
+            }
         }
     }
 
@@ -151,7 +155,7 @@ public class EncounterManager : MonoBehaviour
 
         // brings encounter to the end of the encounter pool.
         encounter.transform.SetAsLastSibling();
-        encounter.GetComponent<Encounter>().getStats(player.GetComponent<Player>());
+        encounter.GetComponent<Encounter>().setStats(player.Stats);
         return encounter;
     }
 
@@ -167,7 +171,7 @@ public class EncounterManager : MonoBehaviour
         statChanges.Clear();
 
         // Get new data
-        encounter.GetComponent<Encounter>().getStats(player.GetComponent<Player>());
+        encounter.GetComponent<Encounter>().updateStats(player.Stats);
         (string, List<(string, string)>, List<string>, List<Stats>) data = encounter.GetComponent<Encounter>().encounterInfo();
 
         text.text = data.Item1;
@@ -268,46 +272,39 @@ public class EncounterManager : MonoBehaviour
     // After, hide all menu buttons and change the game state back to game.
     public void OnClick1()
     {
-        player.GetComponent<Player>().Stats = statChanges[0];
-        menu1.SetActive(false);
-        menu2.SetActive(false);
-        menu3.SetActive(false);
-        menu4.SetActive(false);
+        player.Stats = statChanges[0];
         text.text = resultingText[0];
-        globals.CurrentState = GameState.Game;
-        encounterQueue.Dequeue().SetActive(false);
+        OnClickCleanup();
     }
     public void OnClick2()
     {
-        player.GetComponent<Player>().Stats = statChanges[1];
-        menu1.SetActive(false);
-        menu2.SetActive(false);
-        menu3.SetActive(false);
-        menu4.SetActive(false);
+        player.Stats = statChanges[1];
         text.text = resultingText[1];
-        globals.CurrentState = GameState.Game;
-        encounterQueue.Dequeue().SetActive(false);
+        OnClickCleanup();
     }
     public void OnClick3()
     {
-        player.GetComponent<Player>().Stats = statChanges[2];
-        menu1.SetActive(false);
-        menu2.SetActive(false);
-        menu3.SetActive(false);
-        menu4.SetActive(false);
+        player.Stats = statChanges[2];
         text.text = resultingText[2];
-        globals.CurrentState = GameState.Game;
-        encounterQueue.Dequeue().SetActive(false);
+        OnClickCleanup();
     }
     public void OnClick4()
     {
-        player.GetComponent<Player>().Stats = statChanges[3];
+        player.Stats = statChanges[3];
+        text.text = resultingText[3];
+        OnClickCleanup();
+    }
+    private void OnClickCleanup()
+    {
         menu1.SetActive(false);
         menu2.SetActive(false);
         menu3.SetActive(false);
         menu4.SetActive(false);
-        text.text = resultingText[3];
         globals.CurrentState = GameState.Game;
         encounterQueue.Dequeue().SetActive(false);
+        foreach (GameObject e in encounterQueue)
+        {
+            e.GetComponent<Encounter>().updateStats(player.Stats);
+        }
     }
 }
