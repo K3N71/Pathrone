@@ -23,7 +23,7 @@ public class AttackEncounters : Encounters
             case 0:// strong enemy attacks
                 {
                     descText = "Strong enemy attacks.";
-                    choices.Add(("Push it aside.", ""));
+                    choices.Add(("Push it aside.", "Strength"));
                     int strengthCheck = 7 + Mathf.RoundToInt(8 * check);
                     if (stats.Strength > strengthCheck)
                     {
@@ -40,7 +40,7 @@ public class AttackEncounters : Encounters
                         statChanges.Add(hpChange);
                     }
 
-                    choices.Add(("Dodge the attack.", ""));
+                    choices.Add(("Dodge the attack.", "Intuition/Luck"));
                     int intuitionLuckCheck = 1 + Mathf.RoundToInt(7 * check);
                     if (stats.Intuition + stats.Luck > intuitionLuckCheck)
                     {
@@ -56,7 +56,7 @@ public class AttackEncounters : Encounters
                         statChanges.Add(hpChange);
                     }
 
-                    choices.Add(("Try and find a weak spot.", ""));
+                    choices.Add(("Try and find a weak spot.", "Knowledge/Intuition"));
                     int knowledgeIntuitionCheck = 1 + Mathf.RoundToInt(11 * check);
                     if (stats.Knowledge + stats.Intuition > knowledgeIntuitionCheck)
                     {
@@ -79,7 +79,7 @@ public class AttackEncounters : Encounters
             case 1: // smart enemy attacks
                 {
                     descText = "Smart enemy attacks.";
-                    choices.Add(("Push it aside.", ""));
+                    choices.Add(("Push it aside.", "Strength"));
                     int strengthCheck = 1 + Mathf.RoundToInt(7 * check);
                     if (stats.Strength > strengthCheck)
                     {
@@ -96,7 +96,7 @@ public class AttackEncounters : Encounters
                         statChanges.Add(hpChange);
                     }
 
-                    choices.Add(("Dodge the attack.", ""));
+                    choices.Add(("Dodge the attack.", "Intuition/Luck"));
                     int intuitionLuckCheck = 10 + Mathf.RoundToInt(10 * check);
                     if (stats.Intuition + stats.Luck > intuitionLuckCheck)
                     {
@@ -112,7 +112,7 @@ public class AttackEncounters : Encounters
                         statChanges.Add(hpChange);
                     }
 
-                    choices.Add(("Try and find a weak spot.", ""));
+                    choices.Add(("Try and find a weak spot.", "Knowledge/Intuition"));
                     int knowledgeIntuitionCheck = 6 + Mathf.RoundToInt(12 * check);
                     if (stats.Knowledge + stats.Intuition > knowledgeIntuitionCheck)
                     {
@@ -134,7 +134,7 @@ public class AttackEncounters : Encounters
             case 2: // multiple enemies attacks
                 {
                     descText = "Multiple enemies attack.";
-                    choices.Add(("Outlast the onslaught.", ""));
+                    choices.Add(("Outlast the onslaught.", "Strength"));
                     int strengthCheck = 5 + Mathf.RoundToInt(10 * check);
                     if (stats.Strength > strengthCheck)
                     {
@@ -151,7 +151,7 @@ public class AttackEncounters : Encounters
                         statChanges.Add(hpChange);
                     }
 
-                    choices.Add(("Roll out of the way.", ""));
+                    choices.Add(("Roll out of the way.", "Intuition/Luck"));
                     int intuitionLuckCheck = 10 + Mathf.RoundToInt(8 * check);
                     if (stats.Intuition + stats.Luck > intuitionLuckCheck)
                     {
@@ -167,7 +167,7 @@ public class AttackEncounters : Encounters
                         statChanges.Add(hpChange);
                     }
 
-                    choices.Add(("Look around for cover.", ""));
+                    choices.Add(("Look around for cover.", "Knowledge/Intuition"));
                     int knowledgeIntuitionCheck = 3 + Mathf.RoundToInt(12 * check);
                     if (stats.Knowledge + stats.Intuition > knowledgeIntuitionCheck)
                     {
@@ -189,7 +189,7 @@ public class AttackEncounters : Encounters
             case 3: // disguised enemy attacks
                 {
                     descText = "Disguised enemy approaches!";
-                    choices.Add(("Take off their mask.", ""));
+                    choices.Add(("Take off their mask.", "Strength/Luck"));
                     int strengthLuckCheck = 5 + Mathf.RoundToInt(10 * check);
                     if (stats.Strength + stats.Luck > strengthLuckCheck)
                     {
@@ -205,7 +205,7 @@ public class AttackEncounters : Encounters
                         statChanges.Add(hpChange);
                     }
 
-                    choices.Add(("Just walk away.", ""));
+                    choices.Add(("Just walk away.", "Luck"));
                     int luckCheck = 1 + Mathf.RoundToInt(7 * check);
                     if (stats.Luck > luckCheck)
                     {
@@ -221,7 +221,7 @@ public class AttackEncounters : Encounters
                         statChanges.Add(hpChange);
                     }
 
-                    choices.Add(("Challenge them to a duel.", ""));
+                    choices.Add(("Challenge them to a duel.", "Intuition/Luck"));
                     int intuitionLuckCheck = 10 + Mathf.RoundToInt(10 * check);
                     if (stats.Intuition + stats.Luck > intuitionLuckCheck)
                     {
@@ -296,7 +296,7 @@ public class AttackEncounters : Encounters
                             break;
                     }
 
-                    choices.Add(("Kick him in the face.", ""));
+                    choices.Add(("Kick him in the face.", "All Stats Checked"));
                     int strengthKnowledgeIntuitionLuckCheck = 20 + Mathf.RoundToInt(10 * check);
                     if (stats.Strength + stats.Knowledge + stats.Intuition + stats.Luck > strengthKnowledgeIntuitionLuckCheck)
                     {
